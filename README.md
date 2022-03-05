@@ -1,0 +1,1 @@
+Example of connect to Yandex MQTT broker.
