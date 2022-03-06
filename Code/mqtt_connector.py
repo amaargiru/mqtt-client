@@ -1,10 +1,9 @@
 from paho.mqtt import client as mqtt_client
 
 
-class MqttClient:
-    client: mqtt_client.MqttClient
+class MqttConnector:
 
-    def __init__(self, broker, broker_port, client_id, keepalive, publish_topic, subscribe_topic, logger):
+    def __init__(self, broker, broker_port, client_id, keepalive, logger, publish_topic="", subscribe_topic=""):
         self.broker = broker
         self.broker_port = broker_port
         self.client_id = client_id
@@ -23,7 +22,8 @@ class MqttClient:
                     f"MQTT client \"{self.client_id}\" unable to connect to MQTT broker \"{self.broker}\" and return code \"{rc}\"")
 
             # Subscribe after connection lost
-            self.client.subscribe(self.subscribe_topic)
+            if not "".__eq__(self.subscribe_topic):
+                self.client.subscribe(self.subscribe_topic)
 
         def on_disconnect(client, userdata, rc) -> None:
             if rc != 0:
@@ -48,15 +48,5 @@ class MqttClient:
         self.client.on_log = on_log
         self.client.on_publish = on_publish
         self.client.on_subscribe = on_subscribe
+        self.client.loop_start()
         return self.client
-
-    def publish(self, topic: str, message: str, qos: int):
-        result = self.client.publish(topic, message, qos)
-
-        if result[0] == 0:
-            self.logger.info(f"Message published \"{message}\" to topic \"{topic}\"")
-        else:
-            self.logger.error(f"Publish message error \"{message}\" to topic \"{topic}\"")
-
-    def subscribe(self):
-        self.client.subscribe(self.subscribe_topic)
