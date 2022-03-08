@@ -27,10 +27,10 @@ class MqttConnector:
 
         def on_disconnect(client, userdata, rc) -> None:
             if rc != 0:
-                self.logger.error(f"MQTT client \"{self.client_id}\" disconnect from MQTT broker \"{self.broker}\"")
+                self.logger.error(f"Client \"{self.client_id}\" disconnected from MQTT broker \"{self.broker}\"")
 
         def on_message(client, userdata, message) -> None:
-            self.logger.info(f"Message received \"{message.payload.decode()}\" from topic \"{message.topic}\"")
+            self.logger.info(f"Client \"{self.client_id}\" received message \"{message.payload.decode()}\" from topic \"{message.topic}\"")
 
         def on_log(client, userdata, level, buff) -> None:
             self.logger.debug(buff)

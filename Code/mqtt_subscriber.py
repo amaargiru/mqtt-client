@@ -7,13 +7,12 @@ from mqtt_connector import MqttConnector
 
 broker = "test.mosquitto.org"
 port = 1883
-client_id = f"publisher_{random.randint(0, 1000000)}"
+client_id = f"subscriber_{random.randint(0, 1000000)}"
 mqtt_keepalive = 5 * 60
-publish_topic = "amaargiru/"
-publish_period = 5
+subscribe_topic = "amaargiru/#"  # Multi-level wildcard for cover all topic levels
 
 # Path to logs
-log_file_path = "logs/publisher.log"
+log_file_path = "logs/subscriber.log"
 # Max log file size
 log_max_file_size = 1024 ** 2
 # Max number of log files
@@ -26,7 +25,7 @@ if __name__ == '__main__':
 
     logger = PyLogger.get_logger(log_file_path, log_max_file_size, log_max_file_count)
 
-    connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, publish_topic=publish_topic)
+    connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, subscribe_topic=subscribe_topic)
 
     # Wait for connect to MQTT broker
     client = connector.connect()
@@ -34,12 +33,4 @@ if __name__ == '__main__':
         pass
 
     while True:
-        random_message = f"Random message {random.randint(0, 1000)}"
-        result = client.publish(publish_topic, random_message, qos=1)
-
-        if result[0] == 0:
-            logger.info(f"Message \"{random_message}\" published to topic \"{publish_topic}\"")
-        else:
-            logger.error(f"Publish message error \"{random_message}\" to topic \"{publish_topic}\"")
-
-        time.sleep(publish_period)
+        pass
