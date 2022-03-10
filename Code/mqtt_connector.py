@@ -1,9 +1,12 @@
+import logging
+
 from paho.mqtt import client as mqtt_client
 
 
 class MqttConnector:
 
-    def __init__(self, broker, broker_port, client_id, keepalive, logger, publish_topic="", subscribe_topic=""):
+    def __init__(self, broker: str, broker_port: int, client_id: str, keepalive: int, logger: logging.Logger,
+                 publish_topic: str = "", subscribe_topic: str = ""):
         self.broker = broker
         self.broker_port = broker_port
         self.client_id = client_id

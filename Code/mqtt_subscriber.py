@@ -4,18 +4,18 @@ import random
 from mqtt_connector import MqttConnector
 from pylogger import PyLogger
 
-broker = "test.mosquitto.org"
-port = 1883
-client_id = f"subscriber_{random.randint(0, 1000000)}"
-mqtt_keepalive = 5 * 60
-subscribe_topic = "amaargiru/#"  # Multi-level wildcard for cover all topic levels
+broker: str = "test.mosquitto.org"
+port: int = 1883
+client_id: str = f"subscriber_{random.randint(0, 1000000)}"
+mqtt_keepalive: int = 5 * 60
+subscribe_topic: str = "amaargiru/#"  # Multi-level wildcard for cover all topic levels
 
 # Path to logs
-log_file_path = "logs/subscriber.log"
+log_file_path: str = "logs/subscriber.log"
 # Max log file size
-log_max_file_size = 1024 ** 2
+log_max_file_size: int = 1024 ** 2
 # Max number of log files
-log_max_file_count = 10
+log_max_file_count: int = 10
 
 
 def log_message(message):
