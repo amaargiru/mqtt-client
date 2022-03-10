@@ -17,6 +17,11 @@ log_max_file_size = 1024 ** 2
 # Max number of log files
 log_max_file_count = 10
 
+
+def log_message(message):
+    logger.info(f"Message \"{message}\" received")
+
+
 if __name__ == '__main__':
     # Create a path to the log file(s) if it doesn't exist
     path = pathlib.Path(log_file_path)
@@ -27,7 +32,7 @@ if __name__ == '__main__':
     connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, subscribe_topic=subscribe_topic)
 
     # Simple waiting for connect to MQTT broker
-    connector.connect()
+    connector.connect(on_message_callback=log_message)
     while not connector.is_connected():
         pass
 

@@ -13,7 +13,7 @@ class MqttConnector:
         self.logger = logger
         self.client = mqtt_client.Client(self.client_id)
 
-    def connect(self):
+    def connect(self, on_message_callback=None):
         def on_connect(client, userdata, flags, rc) -> None:
             if rc == 0:
                 if not "".__eq__(self.subscribe_topic):
@@ -29,7 +29,15 @@ class MqttConnector:
                 self.logger.error(f"Client \"{self.client_id}\" disconnected from broker \"{self.broker}\"")
 
         def on_message(client, userdata, message) -> None:
-            self.logger.info(f"Client \"{self.client_id}\" received message \"{message.payload.decode()}\" from topic \"{message.topic}\"")
+            decoded_message = message.payload.decode()
+
+            if on_message_callback:
+                try:
+                    on_message_callback(decoded_message)
+                except Exception as e:
+                    self.logger.error(f"Callback error: {str(e)}")
+
+            self.logger.debug(f"Client \"{self.client_id}\" received message \"{decoded_message}\" from topic \"{message.topic}\"")
 
         def on_log(client, userdata, level, buff) -> None:
             self.logger.debug(buff)
