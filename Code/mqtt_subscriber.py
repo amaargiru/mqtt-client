@@ -1,9 +1,8 @@
 import pathlib
 import random
-import time
 
-from pylogger import PyLogger
 from mqtt_connector import MqttConnector
+from pylogger import PyLogger
 
 broker = "test.mosquitto.org"
 port = 1883
@@ -27,9 +26,9 @@ if __name__ == '__main__':
 
     connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, subscribe_topic=subscribe_topic)
 
-    # Wait for connect to MQTT broker
-    client = connector.connect()
-    while not client.is_connected():
+    # Simple waiting for connect to MQTT broker
+    connector.connect()
+    while not connector.is_connected():
         pass
 
     while True:

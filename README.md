@@ -1,1 +1,1 @@
-Example of connect to MQTT broker.
+Example of wrapper class for Paho MQTT Python client.

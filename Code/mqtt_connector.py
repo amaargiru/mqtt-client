@@ -16,18 +16,17 @@ class MqttConnector:
     def connect(self):
         def on_connect(client, userdata, flags, rc) -> None:
             if rc == 0:
-                self.logger.info(f"MQTT client \"{self.client_id}\" connected to MQTT broker \"{self.broker}\"")
+                if not "".__eq__(self.subscribe_topic):
+                    self.client.subscribe(self.subscribe_topic)
+
+                self.logger.info(f"Client \"{self.client_id}\" connected to broker \"{self.broker}\"")
             else:
                 self.logger.error(
-                    f"MQTT client \"{self.client_id}\" unable to connect to MQTT broker \"{self.broker}\" and return code \"{rc}\"")
-
-            # Subscribe after connection lost
-            if not "".__eq__(self.subscribe_topic):
-                self.client.subscribe(self.subscribe_topic)
+                    f"Client \"{self.client_id}\" unable to connect to broker \"{self.broker}\" and return code \"{rc}\"")
 
         def on_disconnect(client, userdata, rc) -> None:
             if rc != 0:
-                self.logger.error(f"Client \"{self.client_id}\" disconnected from MQTT broker \"{self.broker}\"")
+                self.logger.error(f"Client \"{self.client_id}\" disconnected from broker \"{self.broker}\"")
 
         def on_message(client, userdata, message) -> None:
             self.logger.info(f"Client \"{self.client_id}\" received message \"{message.payload.decode()}\" from topic \"{message.topic}\"")
@@ -48,5 +47,23 @@ class MqttConnector:
         self.client.on_log = on_log
         self.client.on_publish = on_publish
         self.client.on_subscribe = on_subscribe
-        self.client.loop_start()
-        return self.client
+        return self.client.loop_start()
+
+    def disconnect(self):
+        result = self.client.loop_stop()
+        self.logger.info(f"Client \"{self.client_id}\" disconnected from broker \"{self.broker}\"")
+        return result
+
+    def publish(self, topic, payload=None, qos=0, retain=False, properties=None):
+
+        result = self.client.publish(topic, payload, qos)
+
+        if result[0] == 0:
+            self.logger.info(f"Message \"{str(payload)}\" published to topic \"{topic}\"")
+        else:
+            self.logger.error(f"Publish message error \"{str(payload)}\" to topic \"{topic}\"")
+
+        return result
+
+    def is_connected(self):
+        return self.client.is_connected()

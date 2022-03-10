@@ -2,8 +2,8 @@ import pathlib
 import random
 import time
 
-from pylogger import PyLogger
 from mqtt_connector import MqttConnector
+from pylogger import PyLogger
 
 broker = "test.mosquitto.org"
 port = 1883
@@ -28,18 +28,13 @@ if __name__ == '__main__':
 
     connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, publish_topic=publish_topic)
 
-    # Wait for connect to MQTT broker
-    client = connector.connect()
-    while not client.is_connected():
+    # Simple waiting for connect to MQTT broker
+    connector.connect()
+    while not connector.is_connected():
         pass
 
-    while True:
-        random_message = f"Random message {random.randint(0, 1000)}"
-        result = client.publish(publish_topic, random_message, qos=1)
-
-        if result[0] == 0:
-            logger.info(f"Message \"{random_message}\" published to topic \"{publish_topic}\"")
-        else:
-            logger.error(f"Publish message error \"{random_message}\" to topic \"{publish_topic}\"")
+    for i in range(10):
+        message = f"Message {i}"
+        connector.publish(publish_topic, message, qos=1)
 
         time.sleep(publish_period)
