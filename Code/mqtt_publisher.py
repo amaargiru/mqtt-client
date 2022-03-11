@@ -10,6 +10,8 @@ port: int = 1883
 client_id: str = f"publisher_{random.randint(0, 1000000)}"
 mqtt_keepalive: int = 5 * 60
 publish_topic: str = "amaargiru/"
+broker_connect_timeout: int = 1
+broker_reconnect_timeout: int = 10
 publish_period: int = 5
 
 # Path to logs
@@ -28,10 +30,13 @@ if __name__ == '__main__':
 
     connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, publish_topic=publish_topic)
 
-    # Simple waiting for connect to MQTT broker
+    # Waiting for connect to MQTT broker
     connector.connect()
+    time.sleep(broker_connect_timeout)
     while not connector.is_connected():
-        pass
+        logger.debug(f"Timeout {broker_reconnect_timeout} seconds before next connection attempt...")
+        time.sleep(broker_reconnect_timeout)
+        connector.connect()
 
     for i in range(10):
         message = f"Message {i}"

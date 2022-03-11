@@ -1,5 +1,6 @@
 import pathlib
 import random
+import time
 
 from mqtt_connector import MqttConnector
 from pylogger import PyLogger
@@ -9,6 +10,8 @@ port: int = 1883
 client_id: str = f"subscriber_{random.randint(0, 1000000)}"
 mqtt_keepalive: int = 5 * 60
 subscribe_topic: str = "amaargiru/#"  # Multi-level wildcard for cover all topic levels
+broker_connect_timeout: int = 1
+broker_reconnect_timeout: int = 10
 
 # Path to logs
 log_file_path: str = "logs/subscriber.log"
@@ -31,10 +34,13 @@ if __name__ == '__main__':
 
     connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, subscribe_topic=subscribe_topic)
 
-    # Simple waiting for connect to MQTT broker
+    # Waiting for connect to MQTT broker
     connector.connect(on_message_callback=log_message)
+    time.sleep(broker_connect_timeout)
     while not connector.is_connected():
-        pass
+        logger.debug(f"Timeout {broker_reconnect_timeout} seconds before next connection attempt...")
+        time.sleep(broker_reconnect_timeout)
+        connector.connect(on_message_callback=log_message)
 
     while True:
         pass
