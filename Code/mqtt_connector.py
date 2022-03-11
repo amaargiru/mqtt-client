@@ -1,4 +1,5 @@
 import logging
+import urllib
 
 from paho.mqtt import client as mqtt_client
 
@@ -51,14 +52,18 @@ class MqttConnector:
         def on_subscribe(mqttc, obj, mid, granted_qos) -> None:
             self.logger.debug("Subscribed " + str(mid) + " " + str(granted_qos))
 
-        self.client.connect(self.broker, self.broker_port, self.keepalive)
-        self.client.on_connect = on_connect
-        self.client.on_disconnect = on_disconnect
-        self.client.on_message = on_message
-        self.client.on_log = on_log
-        self.client.on_publish = on_publish
-        self.client.on_subscribe = on_subscribe
-        return self.client.loop_start()
+        try:
+            self.client.connect(self.broker, self.broker_port, self.keepalive)
+            self.client.on_connect = on_connect
+            self.client.on_disconnect = on_disconnect
+            self.client.on_message = on_message
+            self.client.on_log = on_log
+            self.client.on_publish = on_publish
+            self.client.on_subscribe = on_subscribe
+            return self.client.loop_start()
+
+        except Exception as e:
+            self.logger.error(f"Connection failed: \"{str(e)}\"")
 
     def disconnect(self):
         result = self.client.loop_stop()
