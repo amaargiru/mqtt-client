@@ -5,7 +5,7 @@ import time
 from mqtt_connector import MqttConnector
 from pylogger import PyLogger
 
-broker: str = "test.mosquitto.org"
+broker: str = "test.mosquitto.org"  # Or, for example, broker.emqx.io, mqtt.eclipse.org
 port: int = 1883
 client_id: str = f"subscriber_{random.randint(0, 1000000)}"
 mqtt_keepalive: int = 5 * 60
