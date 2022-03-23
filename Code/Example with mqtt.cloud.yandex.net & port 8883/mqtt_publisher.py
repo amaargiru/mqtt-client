@@ -1,3 +1,4 @@
+import json
 import pathlib
 import random
 import sys
@@ -7,14 +8,18 @@ sys.path.append('.')
 from Client.mqtt_connector import MqttConnector
 from Logger.pylogger import PyLogger
 
-broker: str = "test.mosquitto.org"  # Or, for example, broker.emqx.io, mqtt.eclipse.org
-port: int = 1883
+broker: str = "mqtt.cloud.yandex.net"
+port: int = 8883
 client_id: str = f"publisher_{random.randint(0, 1000000)}"
 mqtt_keepalive: int = 5 * 60
-publish_topic: str = "amaargiru/"
 broker_connect_timeout: int = 1
 broker_reconnect_timeout: int = 10
 publish_period: int = 5
+
+# Yandex CLoud certificates
+cafile = "certificates/rootCA.crt"
+certfile = "certificates/publisher_cert.pem"
+keyfile = "certificates/publisher_key.pem"
 
 # Path to logs
 log_file_path: str = "logs/publisher.log"
@@ -30,7 +35,13 @@ if __name__ == '__main__':
 
     logger = PyLogger.get_logger(log_file_path, log_max_file_size, log_max_file_count)
 
-    connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, publish_topic=publish_topic)
+    # Load private topic name from config file
+    with open('config/private_config.json') as config_file:
+        config = json.load(config_file)
+        publish_topic = config["topic_name"]
+
+    connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, publish_topic, subscribe_topic="",
+                              cafile=cafile, certfile=certfile, keyfile=keyfile)
 
     # Waiting for connect to MQTT broker
     connector.connect()
@@ -45,3 +56,5 @@ if __name__ == '__main__':
         connector.publish(publish_topic, message, qos=1)
 
         time.sleep(publish_period)
+
+    logger.debug("All done...")

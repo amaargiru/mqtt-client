@@ -6,7 +6,8 @@ from paho.mqtt import client as mqtt_client
 class MqttConnector:
 
     def __init__(self, broker: str, broker_port: int, client_id: str, keepalive: int, logger: logging.Logger,
-                 publish_topic: str = "", subscribe_topic: str = ""):
+                 publish_topic: str = "", subscribe_topic: str = "",
+                 cafile: str = "", certfile: str = "", keyfile: str = ""):
         self.broker = broker
         self.broker_port = broker_port
         self.client_id = client_id
@@ -15,6 +16,9 @@ class MqttConnector:
         self.subscribe_topic = subscribe_topic
         self.logger = logger
         self.client = mqtt_client.Client(self.client_id)
+        self.cafile = cafile
+        self.certfile = certfile
+        self.keyfile = keyfile
 
     def connect(self, on_message_callback=None):
         def on_connect(client, userdata, flags, rc) -> None:
@@ -52,6 +56,9 @@ class MqttConnector:
             self.logger.debug("Subscribed " + str(mid) + " " + str(granted_qos))
 
         try:
+            if not "".__eq__(self.cafile) and not "".__eq__(self.certfile) and not "".__eq__(self.keyfile):
+                self.client.tls_set(self.cafile, self.certfile, self.keyfile)
+
             self.client.connect(self.broker, self.broker_port, self.keepalive)
             self.client.on_connect = on_connect
             self.client.on_disconnect = on_disconnect
