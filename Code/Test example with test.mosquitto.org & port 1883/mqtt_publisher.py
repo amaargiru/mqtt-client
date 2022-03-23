@@ -1,9 +1,11 @@
 import pathlib
 import random
+import sys
 import time
 
-from mqtt_connector import MqttConnector
-from pylogger import PyLogger
+sys.path.append('.')
+from Client.mqtt_connector import MqttConnector
+from Logger.pylogger import PyLogger
 
 broker: str = "test.mosquitto.org"  # Or, for example, broker.emqx.io, mqtt.eclipse.org
 port: int = 1883
