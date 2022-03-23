@@ -12,10 +12,10 @@ broker: str = "mqtt.cloud.yandex.net"
 port: int = 8883
 client_id: str = f"subscriber_{random.randint(0, 1000000)}"
 mqtt_keepalive: int = 5 * 60
-broker_connect_timeout: int = 1
+broker_first_connect_timeout: int = 1
 broker_reconnect_timeout: int = 10
 
-# Yandex CLoud certificates
+# Yandex Cloud certificates
 cafile = "certificates/rootCA.crt"
 certfile = "certificates/subscriber_cert.pem"
 keyfile = "certificates/subscriber_key.pem"
@@ -49,7 +49,7 @@ if __name__ == '__main__':
 
     # Waiting for connect to MQTT broker
     connector.connect(on_message_callback=log_message)
-    time.sleep(broker_connect_timeout)
+    time.sleep(broker_first_connect_timeout)
     while not connector.is_connected():
         logger.debug(f"Timeout {broker_reconnect_timeout} seconds before next connection attempt...")
         time.sleep(broker_reconnect_timeout)
