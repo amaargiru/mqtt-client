@@ -1,7 +1,7 @@
 import pathlib
-import random
 import sys
 import time
+import uuid
 
 sys.path.append('.')
 from Client.mqtt_connector import MqttConnector
@@ -9,7 +9,7 @@ from Logger.pylogger import PyLogger
 
 broker: str = "test.mosquitto.org"  # Or, for example, broker.emqx.io, mqtt.eclipse.org
 port: int = 1883
-client_id: str = f"publisher_{random.randint(0, 1000000)}"
+client_id: str = f"publisher_{str(uuid.uuid4())}"
 mqtt_keepalive: int = 5 * 60
 publish_topic: str = "amaargiru/"
 broker_first_connect_timeout: int = 1
