@@ -30,7 +30,7 @@ log_max_file_count: int = 10
 
 
 def log_message(message):
-    logger.info(f"Message \"{message}\" received")
+    logger.info(f"Message \"{message.payload.decode()}\" received")
 
 
 if __name__ == '__main__':
@@ -43,9 +43,9 @@ if __name__ == '__main__':
     # Load private topic name from config file
     with open('config/private_config.json') as config_file:
         config = json.load(config_file)
-        subscribe_topic = config["topic_name"]
+        subscribe_topics = config["subscribe_topics"]
 
-    connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, publish_topic="", subscribe_topic=subscribe_topic,
+    connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, subscribe_topics=subscribe_topics,
                               cafile=cafile, certfile=certfile, keyfile=keyfile)
 
     # Waiting for connect to MQTT broker

@@ -6,14 +6,12 @@ from paho.mqtt import client as mqtt_client
 class MqttConnector:
 
     def __init__(self, broker: str, broker_port: int, client_id: str, keepalive: int, logger: logging.Logger,
-                 publish_topic: str = "", subscribe_topic: str = "",
-                 cafile: str = "", certfile: str = "", keyfile: str = ""):
+                 subscribe_topics: list[str] = None, cafile: str = "", certfile: str = "", keyfile: str = ""):
         self.broker = broker
         self.broker_port = broker_port
         self.client_id = client_id
         self.keepalive = keepalive
-        self.publish_topic = publish_topic
-        self.subscribe_topic = subscribe_topic
+        self.subscribe_topics = subscribe_topics
         self.logger = logger
         self.client = mqtt_client.Client(self.client_id)
         self.cafile = cafile
@@ -23,28 +21,26 @@ class MqttConnector:
     def connect(self, on_message_callback=None):
         def on_connect(client, userdata, flags, rc) -> None:
             if rc == 0:
-                if not "".__eq__(self.subscribe_topic):
-                    self.client.subscribe(self.subscribe_topic)
+                if self.subscribe_topics is not None:
+                    for topic in self.subscribe_topics:
+                        self.client.subscribe(topic, qos=1)
 
                 self.logger.info(f"Client \"{self.client_id}\" connected to broker \"{self.broker}\"")
             else:
-                self.logger.error(
-                    f"Client \"{self.client_id}\" unable to connect to broker \"{self.broker}\" and return code \"{rc}\"")
+                self.logger.error(f"Client \"{self.client_id}\" unable to connect to broker \"{self.broker}\" and return code \"{rc}\"")
 
         def on_disconnect(client, userdata, rc) -> None:
             if rc != 0:
                 self.logger.error(f"Client \"{self.client_id}\" disconnected from broker \"{self.broker}\"")
 
         def on_message(client, userdata, message) -> None:
-            decoded_message = message.payload.decode()
-
             if on_message_callback:
                 try:
-                    on_message_callback(decoded_message)
+                    on_message_callback(message)
                 except Exception as e:
                     self.logger.error(f"Callback error: {str(e)}")
 
-            self.logger.debug(f"Client \"{self.client_id}\" received message \"{decoded_message}\" from topic \"{message.topic}\"")
+            self.logger.debug(f"Client \"{self.client_id}\" received message \"{message.payload.decode()}\" from topic \"{message.topic}\"")
 
         def on_log(client, userdata, level, buff) -> None:
             self.logger.debug(buff)
@@ -78,12 +74,12 @@ class MqttConnector:
 
     def publish(self, topic, payload=None, qos=0, retain=False, properties=None):
 
-        result = self.client.publish(topic, payload, qos)
+        result = self.client.publish(topic, payload, qos, retain, properties)
 
         if result[0] == 0:
             self.logger.info(f"Message \"{str(payload)}\" published to topic \"{topic}\"")
         else:
-            self.logger.error(f"Error publishing message \"{str(payload)}\" to topic \"{topic}\"")
+            self.logger.error(f"Error publish message \"{str(payload)}\" to topic \"{topic}\"")
 
         return result
 

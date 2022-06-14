@@ -41,8 +41,7 @@ if __name__ == '__main__':
         config = json.load(config_file)
         publish_topic = config["topic_name"]
 
-    connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, publish_topic, subscribe_topic="",
-                              cafile=cafile, certfile=certfile, keyfile=keyfile)
+    connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, cafile=cafile, certfile=certfile, keyfile=keyfile)
 
     # Waiting for connect to MQTT broker
     connector.connect()

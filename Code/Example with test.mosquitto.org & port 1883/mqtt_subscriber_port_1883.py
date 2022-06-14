@@ -12,7 +12,7 @@ port: int = 1883
 # Only alphanumerical and limit length (http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349242)
 client_id: str = f"sub_{str(uuid.uuid4())}".replace("-", "")[:23]
 mqtt_keepalive: int = 5 * 60
-subscribe_topic: str = "amaargiru/#"  # Multi-level wildcard for cover all topic levels
+subscribe_topics: list[str] = ["amaargiru/#"]  # Multi-level wildcard for cover all topic levels
 broker_first_connect_timeout: int = 1
 broker_reconnect_timeout: int = 10
 
@@ -25,7 +25,7 @@ log_max_file_count: int = 10
 
 
 def log_message(message):
-    logger.info(f"Message \"{message}\" received")
+    logger.info(f"Message \"{message.payload.decode()}\" received")
 
 
 if __name__ == '__main__':
@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     logger = PyLogger.get_logger(log_file_path, log_max_file_size, log_max_file_count)
 
-    connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, subscribe_topic=subscribe_topic)
+    connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, subscribe_topics=subscribe_topics)
 
     # Waiting for connect to MQTT broker
     connector.connect(on_message_callback=log_message)
