@@ -39,7 +39,7 @@ if __name__ == '__main__':
     # Load private topic name from config file
     with open('config/private_config.json') as config_file:
         config = json.load(config_file)
-        publish_topic = config["topic_name"]
+        publish_topic = config["publish_topic"]
 
     connector = MqttConnector(broker, port, client_id, mqtt_keepalive, logger, cafile=cafile, certfile=certfile, keyfile=keyfile)
 
