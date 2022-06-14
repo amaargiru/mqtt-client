@@ -9,7 +9,8 @@ from Logger.pylogger import PyLogger
 
 broker: str = "test.mosquitto.org"  # Or, for example, broker.emqx.io, mqtt.eclipse.org
 port: int = 1883
-client_id: str = f"publisher_{str(uuid.uuid4())}"
+# Only alphanumerical and limit length (http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349242)
+client_id: str = f"pub_{str(uuid.uuid4())}".replace("-", "")[:23]
 mqtt_keepalive: int = 5 * 60
 publish_topic: str = "amaargiru/"
 broker_first_connect_timeout: int = 1

@@ -10,7 +10,8 @@ from Logger.pylogger import PyLogger
 
 broker: str = "mqtt.cloud.yandex.net"
 port: int = 8883
-client_id: str = f"subscriber_{str(uuid.uuid4())}"
+# Only alphanumerical and limit length (http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc385349242)
+client_id: str = f"sub_{str(uuid.uuid4())}".replace("-", "")[:23]
 mqtt_keepalive: int = 5 * 60
 broker_first_connect_timeout: int = 1
 broker_reconnect_timeout: int = 10
