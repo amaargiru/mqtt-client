@@ -1,4 +1,5 @@
 import logging
+import socket
 
 from paho.mqtt import client as mqtt_client
 
@@ -56,6 +57,13 @@ class MqttConnector:
                 self.client.tls_set(self.cafile, self.certfile, self.keyfile)
 
             self.client.connect(self.broker, self.broker_port, self.keepalive)
+
+            # Work around for the problem when the client doesn't track the physical disconnection and continues to send packets
+            self.client.socket().setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+            self.client.socket().setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 40)
+            self.client.socket().setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 60)
+            self.client.socket().setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 3)
+
             self.client.on_connect = on_connect
             self.client.on_disconnect = on_disconnect
             self.client.on_message = on_message
